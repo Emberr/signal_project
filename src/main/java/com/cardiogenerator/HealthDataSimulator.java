@@ -117,7 +117,7 @@ public class HealthDataSimulator {
     }
 
     /**
-     * Print the help message
+     * Prints the help message
      */
     private static void printHelp() {
         System.out.println("Usage: java HealthDataSimulator [options]");

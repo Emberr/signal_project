@@ -3,7 +3,7 @@ package com.cardiogenerator.generators;
 import com.cardiogenerator.outputs.OutputStrategy;
 
 /**
- * Interfact for generating patient data
+ * Interface for generating patient data
  * Standard definition for generating patient data
  */
 public interface PatientDataGenerator {

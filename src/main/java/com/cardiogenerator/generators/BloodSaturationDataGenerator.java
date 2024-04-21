@@ -13,7 +13,7 @@ public class BloodSaturationDataGenerator implements PatientDataGenerator {
     private int[] lastSaturationValues;
 
     /**
-     * Contructor for the class.
+     * Constructor for the class.
      * Initializes the last saturation values between 95 and 100 for each patient.
      * @param patientCount number of patients
      */

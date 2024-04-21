@@ -1,5 +1,9 @@
 package com.cardiogenerator.outputs;
 
+/**
+ * Interface for data output strategy
+ * Standard definition for outputting data
+ */
 public interface OutputStrategy {
 
     /**
