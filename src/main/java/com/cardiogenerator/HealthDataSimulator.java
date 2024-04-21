@@ -48,10 +48,17 @@ public class HealthDataSimulator {
         scheduleTasksForPatients(patientIds);
     }
 
+    /**
+     * Parse the command line arguments
+     *
+     * @param args The command line arguments
+     * @throws IOException If an I/O error occurs
+     */
+
     private static void parseArguments(String[] args) throws IOException {
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
-                case "-h":
+                case "-h": // Show help and exit
                     printHelp();
                     System.exit(0);
                     break;
@@ -109,6 +116,9 @@ public class HealthDataSimulator {
         }
     }
 
+    /**
+     * Print the help message
+     */
     private static void printHelp() {
         System.out.println("Usage: java HealthDataSimulator [options]");
         System.out.println("Options:");
@@ -126,6 +136,12 @@ public class HealthDataSimulator {
                 "  This command simulates data for 100 patients and sends the output to WebSocket clients connected to port 8080.");
     }
 
+    /**
+     * Initialize the patient IDs
+     *
+     * @param patientCount The number of patients to generate IDs for
+     * @return The list of patient IDs
+     */
     private static List<Integer> initializePatientIds(int patientCount) {
         List<Integer> patientIds = new ArrayList<>();
         for (int i = 1; i <= patientCount; i++) {
