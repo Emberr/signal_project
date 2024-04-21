@@ -6,12 +6,22 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.Executors;
 
+/**
+ * This class implements the OutputStrategy interface and sends data over TCP
+ * Starts a TCP server and accepts new clients in a new thread
+ * Then outputs the data to the connected client.
+ */
+
 public class TcpOutputStrategy implements OutputStrategy {
 
     private ServerSocket serverSocket;
     private Socket clientSocket;
     private PrintWriter out;
-
+    /**
+     * TCPOutputStrategy constructor that listens on the given port.
+     *
+     * @param port The port to listen on
+     */
     public TcpOutputStrategy(int port) {
         try {
             serverSocket = new ServerSocket(port);
