@@ -1,5 +1,29 @@
 # UML Diagram Descriptions
 
+### Alert Class Diagram
+
+![Alert Class Diagram](AlertGeneratorSystem.png)
+
+placeholder
+
+### Data Storage Class Diagram
+
+![Data Storage Class Diagram](DataStorageSystem.png)
+
+placeholder
+
+### Patient Identifier Class Diagram
+
+![Patient Identifier Class Diagram](PatientIdentifierSystem.png)
+
+placeholder
+
+### Data Listener Class Diagram
+
+![Data Listener Class Diagram](DataListenerSystem.png)
+
+placeholder
+
 ### Alert State Diagram
 
 <img alt="Alert State Diagram" src="AlertState.png" width="250"/>
