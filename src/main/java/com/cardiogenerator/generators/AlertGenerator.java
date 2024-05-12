@@ -2,6 +2,8 @@ package com.cardiogenerator.generators; //removed underscore from package name
 
 import java.util.Random; //removed empty space between import lines
 import com.cardiogenerator.outputs.OutputStrategy;
+import com.data_management.DataStorage;
+import com.data_management.Patient;
 
 public class AlertGenerator implements PatientDataGenerator {
 

@@ -1,10 +1,12 @@
 package com.data_management;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.alerts.AlertGenerator;
+import com.alerts.AlertManager;
 
 /**
  * Manages storage and retrieval of patient data within a healthcare monitoring
@@ -82,14 +84,11 @@ public class DataStorage {
      * 
      * @param args command line arguments
      */
-    public static void main(String[] args) {
-        // DataReader is not defined in this scope, should be initialized appropriately.
-        // DataReader reader = new SomeDataReaderImplementation("path/to/data");
+    public static void main(String[] args) throws IOException {
+        DataReader reader = new FileDataReader("C:\\Users\\zanez\\signal_project\\test_data");
         DataStorage storage = new DataStorage();
 
-        // Assuming the reader has been properly initialized and can read data into the
-        // storage
-        // reader.readData(storage);
+        reader.readData(storage);
 
         // Example of using DataStorage to retrieve and print records for a patient
         List<PatientRecord> records = storage.getRecords(1, 1700000000000L, 1800000000000L);
@@ -101,7 +100,8 @@ public class DataStorage {
         }
 
         // Initialize the AlertGenerator with the storage
-        AlertGenerator alertGenerator = new AlertGenerator(storage);
+        AlertManager alertManager = new AlertManager();
+        AlertGenerator alertGenerator = new AlertGenerator(storage, alertManager);
 
         // Evaluate all patients' data to check for conditions that may trigger alerts
         for (Patient patient : storage.getAllPatients()) {
