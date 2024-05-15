@@ -90,6 +90,12 @@ public class AlertGenerator {
                 if (lastSaturationReading.size() > 1) {
                     lastSaturationReading.poll();
                 }
+                if (!lastSaturationReadings.isEmpty()) {
+                    if (checkLowSaturationAlert(lastSaturationReadings.peek())) {
+                        Alert alert = new Alert(patient.getPatientIdString(), "Low Oxygen Saturation", System.currentTimeMillis());
+                        triggerAlert(alert);
+                    }
+                }
                 if (lastSaturationReadings.size() == 2) {
                     if (checkRapidDropAlert(new ArrayList<>(lastSaturationReadings))) {
                         Alert alert = new Alert(patient.getPatientIdString(), "Rapid Drop in Oxygen Saturation", System.currentTimeMillis());

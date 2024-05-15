@@ -85,13 +85,13 @@ public class DataStorage {
      * @param args command line arguments
      */
     public static void main(String[] args) throws IOException {
-        DataReader reader = new FileDataReader("C:\\Users\\zanez\\signal_project\\test_data");
+        DataReader reader = new FileDataReader("test_data");
         DataStorage storage = new DataStorage();
 
         reader.readData(storage);
 
         // Example of using DataStorage to retrieve and print records for a patient
-        List<PatientRecord> records = storage.getRecords(1, 1700000000000L, 1800000000000L);
+        List<PatientRecord> records = storage.getRecords(2, 0, 1200);
         for (PatientRecord record : records) {
             System.out.println("Record for Patient ID: " + record.getPatientId() +
                     ", Type: " + record.getRecordType() +
@@ -106,7 +106,7 @@ public class DataStorage {
         // Evaluate all patients' data to check for conditions that may trigger alerts
 
         for (Patient patient : storage.getAllPatients()) {
-            alertGenerator.evaluateData(patient, 1500000000000L, 2000000000000L);
+            alertGenerator.evaluateData(patient, 0, 1200);
         }
 
     }
