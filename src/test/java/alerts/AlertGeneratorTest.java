@@ -8,7 +8,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.data_management.Patient;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -66,16 +68,15 @@ public class AlertGeneratorTest {
     }
 
     @Test
-    @DisplayName("Test checkAbnormalHeartRateAlert method")
-    public void testCheckAbnormalHeartRateAlert() {
-        assertTrue(alertGenerator.checkAbnormalHeartRateAlert(49));
+    @DisplayName("Test checkECGDataAlert method")
+    public void testCheckECGDataAlert() {
+        mock.addRecord(100, "ECG", 1000);
+        mock.addRecord(120, "ECG", 2000);
+        mock.addRecord(170, "ECG", 3000);
+        Queue<Double> ecgWindow = new LinkedList<>();
+        ecgWindow.add(100.0);
+        ecgWindow.add(120.0);
+        assertTrue(alertGenerator.evaluateECGData(mock.getRecords(3000, 3000).get(0), ecgWindow, 220, 10, 1.3));
     }
 
-    @Test
-    @DisplayName("Test checkIrregularBeatAlert method")
-    public void testCheckIrregularBeatAlert() {
-        mock.addRecord(49, "ECG", 1000);
-        List<PatientRecord> records = mock.getRecords(1000, 1000);
-        assertTrue(alertGenerator.checkIrregularBeatAlert(records.get(0)));
-    }
 }

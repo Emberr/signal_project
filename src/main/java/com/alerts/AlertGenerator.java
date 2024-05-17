@@ -49,6 +49,10 @@ public class AlertGenerator {
         PriorityQueue<PatientRecord> lastSaturationReadings = new PriorityQueue<>(Comparator.comparingLong(PatientRecord::getTimestamp).reversed());
         PriorityQueue<PatientRecord> lastSystolicReading = new PriorityQueue<>(Comparator.comparingLong(PatientRecord::getTimestamp).reversed());
         PriorityQueue<PatientRecord> lastSaturationReading = new PriorityQueue<>(Comparator.comparingLong(PatientRecord::getTimestamp).reversed());
+        Queue<Double> ecgWindow = new LinkedList<>();
+        double ecgSum = 0;
+        final int WINDOW_SIZE = 10;
+        final double THRESHOLD = 1.3;
 
         for (PatientRecord record : records) {
             if (record.getRecordType().contains("Systolic")) {
@@ -111,16 +115,9 @@ public class AlertGenerator {
                 }
             }
 
-            if (record.getRecordType().contains("Rate")) {
-                if (checkAbnormalHeartRateAlert(record.getMeasurementValue())) {
-                    Alert alert = new Alert(patient.getPatientIdString(), "Abnormal Heart Rate", System.currentTimeMillis());
-                    triggerAlert(alert);
-                }
-            }
-
             if (record.getRecordType().contains("ECG")) {
-                if (checkIrregularBeatAlert(record)) {
-                    Alert alert = new Alert(patient.getPatientIdString(), "Irregular Heart Beat", System.currentTimeMillis());
+                if (evaluateECGData(record, ecgWindow, ecgSum, WINDOW_SIZE, THRESHOLD)) {
+                    Alert alert = new Alert(patient.getPatientIdString(), "Abnormal ECG Peak", System.currentTimeMillis());
                     triggerAlert(alert);
                 }
             }
@@ -189,16 +186,16 @@ public class AlertGenerator {
         return systolic < 90 && saturation < 92;
     }
 
-    public boolean checkAbnormalHeartRateAlert(double heartRate) {
-        return heartRate < 50 || heartRate > 100;
+    public boolean evaluateECGData(PatientRecord record, Queue<Double> ecgWindow, double ecgSum, int windowSize, double threshold) {
+        double heartRate = record.getMeasurementValue();
+        ecgSum += heartRate;
+        ecgWindow.add(heartRate);
+        if (ecgWindow.size() > windowSize) {
+            ecgSum -= ecgWindow.poll();
+        }
+        double average = ecgSum / ecgWindow.size();
+        return heartRate > average * threshold;
     }
 
-    public boolean checkIrregularBeatAlert(PatientRecord record) {
-        if (!record.getRecordType().contains("ECG")) {
-            return false;
-        }
-        double heartRate = record.getMeasurementValue();
-        return heartRate < 50 || heartRate > 100;
-    }
 }
 
