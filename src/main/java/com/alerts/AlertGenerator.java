@@ -26,6 +26,7 @@ public class AlertGenerator {
      *
      * @param dataStorage the data storage system that provides access to patient
      *                    data
+     * @param alertManager the alert manager system that logs and manages alerts
      */
     public AlertGenerator(DataStorage dataStorage, AlertManager alertManager) {
         this.dataStorage = dataStorage;
@@ -142,6 +143,12 @@ public class AlertGenerator {
         alertManager.logAlert(alert);
     }
 
+    /**
+     * Checks if the trend alert condition is met for the given list of patient records.
+     *
+     * @param records the list of patient records to check
+     * @return true if the trend alert condition is met, false otherwise
+     */
     public boolean checkTrendAlert(List<PatientRecord> records) {
         Collections.sort(records, Comparator.comparingLong(PatientRecord::getTimestamp));
         double rec1 = records.get(0).getMeasurementValue();
@@ -150,6 +157,12 @@ public class AlertGenerator {
         return (rec1 - rec2 > 10 && rec2 - rec3 > 10) || (rec1 - rec2 < -10 && rec2 - rec3 < -10);
     }
 
+    /**
+     * Checks if the low saturation alert condition is met for the given patient record.
+     *
+     * @param record the patient record to check
+     * @return true if the low saturation alert condition is met, false otherwise
+     */
     public boolean checkCriticalThresholdAlert(PatientRecord record) {
         if (!record.getRecordType().contains("Pressure")) {
             return false;
@@ -159,6 +172,12 @@ public class AlertGenerator {
                 (record.getRecordType().contains("Diastolic") && (pressure > 120 || pressure < 60));
     }
 
+    /**
+     * Checks if the low saturation alert condition is met for the given patient record.
+     *
+     * @param record the patient record to check
+     * @return true if the low saturation alert condition is met, false otherwise
+     */
     public boolean checkLowSaturationAlert(PatientRecord record) {
         if (!record.getRecordType().contains("Saturation")) {
             return false;
@@ -167,6 +186,12 @@ public class AlertGenerator {
         return saturation < 92;
     }
 
+    /**
+     * Checks if the rapid drop alert condition is met for the given list of patient records.
+     *
+     * @param records the list of patient records to check
+     * @return true if the rapid drop alert condition is met, false otherwise
+     */
     public boolean checkRapidDropAlert(List<PatientRecord> records) {
         Collections.sort(records, Comparator.comparingLong(PatientRecord::getTimestamp));
         double saturation1 = records.get(0).getMeasurementValue();
@@ -174,6 +199,13 @@ public class AlertGenerator {
         return saturation1 - saturation2 > 5 && records.get(1).getTimestamp() - records.get(0).getTimestamp() <= 600000; // 10 minutes in milliseconds
     }
 
+    /**
+     * Checks if the hypotensive hypoxemia alert condition is met for the given systolic and saturation records.
+     *
+     * @param systolicRecord the systolic record to check
+     * @param saturationRecord the saturation record to check
+     * @return true if the hypotensive hypoxemia alert condition is met, false otherwise
+     */
     public boolean checkHypotensiveHypoxemiaAlert(PatientRecord systolicRecord, PatientRecord saturationRecord) {
         if (systolicRecord == null || saturationRecord == null) {
             return false;
@@ -186,6 +218,16 @@ public class AlertGenerator {
         return systolic < 90 && saturation < 92;
     }
 
+    /**
+     * Evaluates the ECG data for the given patient record and checks if the abnormal ECG peak condition is met.
+     *
+     * @param record the patient record to evaluate
+     * @param ecgWindow the queue of recent ECG readings
+     * @param ecgSum the sum of the ECG readings in the window
+     * @param windowSize the size of the sliding window
+     * @param threshold the threshold for abnormal peak
+     * @return true if the abnormal ECG peak condition is met, false otherwise
+     */
     public boolean evaluateECGData(PatientRecord record, Queue<Double> ecgWindow, double ecgSum, int windowSize, double threshold) {
         double heartRate = record.getMeasurementValue();
         ecgSum += heartRate;

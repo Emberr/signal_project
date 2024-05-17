@@ -61,9 +61,20 @@ public class Patient {
         return recordsInRange;
     }
 
+    /**
+     * Retrieves the patient's ID as a string.
+     *
+     * @return the patient's ID as a string
+     */
     public String getPatientIdString() {
         return Integer.toString(patientId);
     }
+
+    /**
+     * Retrieves the patient's ID.
+     *
+     * @return the patient's ID
+     */
     public int getPatientId() {
         return patientId;
     }
