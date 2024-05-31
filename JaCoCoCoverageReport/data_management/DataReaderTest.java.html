@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataReaderTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java in cardio_generator Coverage Results</a> &gt; <a href="index.source.html" class="el_package">data_management</a> &gt; <span class="el_source">DataReaderTest.java</span></div><h1>DataReaderTest.java</h1><pre class="source lang-java linenums">package data_management;
+
+import com.data_management.DataReader;
+import com.data_management.DataStorage;
+import com.data_management.FileDataReader;
+import com.data_management.PatientRecord;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+<span class="fc" id="L14">public class DataReaderTest {</span>
+
+    @Test
+    void testReadData() throws IOException {
+
+<span class="fc" id="L19">        DataReader reader = new FileDataReader(&quot;test_data&quot;);</span>
+<span class="fc" id="L20">        DataStorage storage = new DataStorage();</span>
+
+<span class="fc" id="L22">        reader.readData(storage);</span>
+
+<span class="fc" id="L24">        List&lt;PatientRecord&gt; records = storage.getRecords(2, 0, 1200);</span>
+<span class="fc bfc" id="L25" title="All 2 branches covered.">        for (PatientRecord record : records) {</span>
+<span class="fc" id="L26">            System.out.println(&quot;Record for Patient ID: &quot; + record.getPatientId() +</span>
+<span class="fc" id="L27">                    &quot;, Type: &quot; + record.getRecordType() +</span>
+<span class="fc" id="L28">                    &quot;, Data: &quot; + record.getMeasurementValue() +</span>
+<span class="fc" id="L29">                    &quot;, Timestamp: &quot; + record.getTimestamp());</span>
+<span class="fc" id="L30">        }</span>
+<span class="fc" id="L31">        assertEquals(12, records.size());</span>
+<span class="fc" id="L32">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

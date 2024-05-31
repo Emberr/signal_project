@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataStorageTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java in cardio_generator Coverage Results</a> &gt; <a href="index.source.html" class="el_package">data_management</a> &gt; <span class="el_source">DataStorageTest.java</span></div><h1>DataStorageTest.java</h1><pre class="source lang-java linenums">package data_management;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import com.data_management.DataReader;
+import com.data_management.FileDataReader;
+import org.junit.jupiter.api.Test;
+import com.data_management.DataStorage;
+import com.data_management.PatientRecord;
+
+import java.io.IOException;
+import java.util.List;
+
+<span class="fc" id="L14">class DataStorageTest {</span>
+
+    @Test
+    void testAddAndGetRecords() throws IOException {
+        // TODO Perhaps you can implement a mock data reader to mock the test data?
+        //DataReader reader = new FileDataReader(&quot;data/test_data.csv&quot;);
+<span class="fc" id="L20">        DataStorage storage = new DataStorage();</span>
+        //reader.readData(storage);
+<span class="fc" id="L22">        storage.addPatientData(1, 100.0, &quot;HeartRate&quot;, 1714376789050L);</span>
+<span class="fc" id="L23">        storage.addPatientData(1, 120.0, &quot;HeartRate&quot;, 1714376789051L);</span>
+<span class="fc" id="L24">        List&lt;PatientRecord&gt; records = storage.getRecords(1, 1714376789050L, 1714376789051L);</span>
+<span class="fc" id="L25">        assertEquals(2, records.size()); // Check if two records are retrieved</span>
+<span class="fc" id="L26">        assertEquals(100.0, records.get(0).getMeasurementValue()); // Validate first record</span>
+<span class="fc" id="L27">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

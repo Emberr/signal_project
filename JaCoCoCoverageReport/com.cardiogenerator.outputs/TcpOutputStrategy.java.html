@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TcpOutputStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java in cardio_generator Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.cardiogenerator.outputs</a> &gt; <span class="el_source">TcpOutputStrategy.java</span></div><h1>TcpOutputStrategy.java</h1><pre class="source lang-java linenums">package com.cardiogenerator.outputs;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.Executors;
+
+/**
+ * This class implements the OutputStrategy interface and sends data over TCP
+ * Starts a TCP server and accepts new clients in a new thread
+ * Then outputs the data to the connected client.
+ */
+
+public class TcpOutputStrategy implements OutputStrategy {
+
+    private ServerSocket serverSocket;
+    private Socket clientSocket;
+    private PrintWriter out;
+    /**
+     * TCPOutputStrategy constructor that listens on the given port.
+     *
+     * @param port The port to listen on
+     */
+<span class="nc" id="L25">    public TcpOutputStrategy(int port) {</span>
+        try {
+<span class="nc" id="L27">            serverSocket = new ServerSocket(port);</span>
+<span class="nc" id="L28">            System.out.println(&quot;TCP Server started on port &quot; + port);</span>
+
+            // Accept clients in a new thread to not block the main thread
+<span class="nc" id="L31">            Executors.newSingleThreadExecutor().submit(() -&gt; {</span>
+                try {
+<span class="nc" id="L33">                    clientSocket = serverSocket.accept();</span>
+<span class="nc" id="L34">                    out = new PrintWriter(clientSocket.getOutputStream(), true);</span>
+<span class="nc" id="L35">                    System.out.println(&quot;Client connected: &quot; + clientSocket.getInetAddress());</span>
+<span class="nc" id="L36">                } catch (IOException e) {</span>
+<span class="nc" id="L37">                    e.printStackTrace();</span>
+<span class="nc" id="L38">                }</span>
+<span class="nc" id="L39">            });</span>
+<span class="nc" id="L40">        } catch (IOException e) {</span>
+<span class="nc" id="L41">            e.printStackTrace();</span>
+<span class="nc" id="L42">        }</span>
+<span class="nc" id="L43">    }</span>
+
+    @Override
+    public void output(int patientId, long timestamp, String label, String data) {
+<span class="nc bnc" id="L47" title="All 2 branches missed.">        if (out != null) {</span>
+<span class="nc" id="L48">            String message = String.format(&quot;%d,%d,%s,%s&quot;, patientId, timestamp, label, data);</span>
+<span class="nc" id="L49">            out.println(message);</span>
+        }
+<span class="nc" id="L51">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

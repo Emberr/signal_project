@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AlertGenerator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java in cardio_generator Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.alerts</a> &gt; <span class="el_source">AlertGenerator.java</span></div><h1>AlertGenerator.java</h1><pre class="source lang-java linenums">package com.alerts;
+
+import com.cardiogenerator.outputs.ConsoleOutputStrategy;
+import com.cardiogenerator.outputs.OutputStrategy;
+import com.data_management.DataStorage;
+import com.data_management.Patient;
+import com.data_management.PatientRecord;
+
+import java.util.*;
+
+/**
+ * The {@code AlertGenerator} class is responsible for monitoring patient data
+ * and generating alerts when certain predefined conditions are met. This class
+ * relies on a {@link DataStorage} instance to access patient data and evaluate
+ * it against specific health criteria.
+ */
+
+public class AlertGenerator {
+    private DataStorage dataStorage;
+    private AlertManager alertManager;
+
+    /**
+     * Constructs an {@code AlertGenerator} with a specified {@code DataStorage}.
+     * The {@code DataStorage} is used to retrieve patient data that this class
+     * will monitor and evaluate.
+     *
+     * @param dataStorage the data storage system that provides access to patient
+     *                    data
+     * @param alertManager the alert manager system that logs and manages alerts
+     */
+<span class="fc" id="L31">    public AlertGenerator(DataStorage dataStorage, AlertManager alertManager) {</span>
+<span class="fc" id="L32">        this.dataStorage = dataStorage;</span>
+<span class="fc" id="L33">        this.alertManager = alertManager;</span>
+<span class="fc" id="L34">    }</span>
+
+    /**
+     * Evaluates the specified patient's data to determine if any alert conditions
+     * are met. If a condition is met, an alert is triggered via the
+     * {@link #triggerAlert}
+     * method. This method should define the specific conditions under which an
+     * alert
+     * will be triggered.
+     *
+     * @param patient the patient data to evaluate for alert conditions
+     */
+    public void evaluateData(Patient patient, long startTime, long endTime) {
+<span class="nc" id="L47">        List&lt;PatientRecord&gt; records = dataStorage.getRecords(patient.getPatientId(), startTime, endTime);</span>
+<span class="nc" id="L48">        PriorityQueue&lt;PatientRecord&gt; lastThreeSystolicReadings = new PriorityQueue&lt;&gt;(Comparator.comparingLong(PatientRecord::getTimestamp).reversed());</span>
+<span class="nc" id="L49">        PriorityQueue&lt;PatientRecord&gt; lastThreeDiastolicReadings = new PriorityQueue&lt;&gt;(Comparator.comparingLong(PatientRecord::getTimestamp).reversed());</span>
+<span class="nc" id="L50">        PriorityQueue&lt;PatientRecord&gt; lastSaturationReadings = new PriorityQueue&lt;&gt;(Comparator.comparingLong(PatientRecord::getTimestamp).reversed());</span>
+<span class="nc" id="L51">        PriorityQueue&lt;PatientRecord&gt; lastSystolicReading = new PriorityQueue&lt;&gt;(Comparator.comparingLong(PatientRecord::getTimestamp).reversed());</span>
+<span class="nc" id="L52">        PriorityQueue&lt;PatientRecord&gt; lastSaturationReading = new PriorityQueue&lt;&gt;(Comparator.comparingLong(PatientRecord::getTimestamp).reversed());</span>
+<span class="nc" id="L53">        Queue&lt;Double&gt; ecgWindow = new LinkedList&lt;&gt;();</span>
+<span class="nc" id="L54">        double ecgSum = 0;</span>
+<span class="nc" id="L55">        final int WINDOW_SIZE = 10;</span>
+<span class="nc" id="L56">        final double THRESHOLD = 1.3;</span>
+
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        for (PatientRecord record : records) {</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">            if (record.getRecordType().contains(&quot;Systolic&quot;)) {</span>
+<span class="nc" id="L60">                lastThreeSystolicReadings.add(record);</span>
+<span class="nc" id="L61">                lastSystolicReading.add(record);</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">                if (lastThreeSystolicReadings.size() &gt; 3) {</span>
+<span class="nc" id="L63">                    lastThreeSystolicReadings.poll();</span>
+                }
+<span class="nc bnc" id="L65" title="All 2 branches missed.">                if (lastSystolicReading.size() &gt; 1) {</span>
+<span class="nc" id="L66">                    lastSystolicReading.poll();</span>
+                }
+<span class="nc bnc" id="L68" title="All 2 branches missed.">                if (lastThreeSystolicReadings.size() == 3) {</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">                    if (checkTrendAlert(new ArrayList&lt;&gt;(lastThreeSystolicReadings))) {</span>
+<span class="nc" id="L70">                        Alert alert = new Alert(patient.getPatientIdString(), &quot;Trend Alert: Systolic Blood Pressure&quot;, System.currentTimeMillis());</span>
+<span class="nc" id="L71">                        triggerAlert(alert);</span>
+                    }
+                }
+            }
+
+<span class="nc bnc" id="L76" title="All 2 branches missed.">            if (record.getRecordType().contains(&quot;Diastolic&quot;)) {</span>
+<span class="nc" id="L77">                lastThreeDiastolicReadings.add(record);</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">                if (lastThreeDiastolicReadings.size() &gt; 3) {</span>
+<span class="nc" id="L79">                    lastThreeDiastolicReadings.poll();</span>
+                }
+<span class="nc bnc" id="L81" title="All 2 branches missed.">                if (lastThreeDiastolicReadings.size() == 3) {</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">                    if (checkTrendAlert(new ArrayList&lt;&gt;(lastThreeDiastolicReadings))) {</span>
+<span class="nc" id="L83">                        Alert alert = new Alert(patient.getPatientIdString(), &quot;Trend Alert: Diastolic Blood Pressure&quot;, System.currentTimeMillis());</span>
+<span class="nc" id="L84">                        triggerAlert(alert);</span>
+                    }
+                }
+            }
+
+<span class="nc bnc" id="L89" title="All 2 branches missed.">            if (record.getRecordType().contains(&quot;Saturation&quot;)) {</span>
+<span class="nc" id="L90">                lastSaturationReadings.add(record);</span>
+<span class="nc" id="L91">                lastSaturationReading.add(record);</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">                if (lastSaturationReadings.size() &gt; 2) {</span>
+<span class="nc" id="L93">                    lastSaturationReadings.poll();</span>
+                }
+<span class="nc bnc" id="L95" title="All 2 branches missed.">                if (lastSaturationReading.size() &gt; 1) {</span>
+<span class="nc" id="L96">                    lastSaturationReading.poll();</span>
+                }
+<span class="nc bnc" id="L98" title="All 2 branches missed.">                if (!lastSaturationReadings.isEmpty()) {</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">                    if (checkLowSaturationAlert(lastSaturationReadings.peek())) {</span>
+<span class="nc" id="L100">                        Alert alert = new Alert(patient.getPatientIdString(), &quot;Low Oxygen Saturation&quot;, System.currentTimeMillis());</span>
+<span class="nc" id="L101">                        triggerAlert(alert);</span>
+                    }
+                }
+<span class="nc bnc" id="L104" title="All 2 branches missed.">                if (lastSaturationReadings.size() == 2) {</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">                    if (checkRapidDropAlert(new ArrayList&lt;&gt;(lastSaturationReadings))) {</span>
+<span class="nc" id="L106">                        Alert alert = new Alert(patient.getPatientIdString(), &quot;Rapid Drop in Oxygen Saturation&quot;, System.currentTimeMillis());</span>
+<span class="nc" id="L107">                        triggerAlert(alert);</span>
+                    }
+                }
+            }
+
+<span class="nc bnc" id="L112" title="All 4 branches missed.">            if (!lastSystolicReading.isEmpty() &amp;&amp; !lastSaturationReading.isEmpty()) {</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">                if (checkHypotensiveHypoxemiaAlert(lastSystolicReading.peek(), lastSaturationReading.peek())) {</span>
+<span class="nc" id="L114">                    Alert alert = new Alert(patient.getPatientIdString(), &quot;Hypotensive Hypoxemia&quot;, System.currentTimeMillis());</span>
+<span class="nc" id="L115">                    triggerAlert(alert);</span>
+                }
+            }
+
+<span class="nc bnc" id="L119" title="All 2 branches missed.">            if (record.getRecordType().contains(&quot;ECG&quot;)) {</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">                if (evaluateECGData(record, ecgWindow, ecgSum, WINDOW_SIZE, THRESHOLD)) {</span>
+<span class="nc" id="L121">                    Alert alert = new Alert(patient.getPatientIdString(), &quot;Abnormal ECG Peak&quot;, System.currentTimeMillis());</span>
+<span class="nc" id="L122">                    triggerAlert(alert);</span>
+                }
+            }
+
+<span class="nc bnc" id="L126" title="All 2 branches missed.">            if (checkCriticalThresholdAlert(record)) {</span>
+<span class="nc" id="L127">                Alert alert = new Alert(patient.getPatientIdString(), &quot;Critical Blood Pressure&quot;, System.currentTimeMillis());</span>
+<span class="nc" id="L128">                triggerAlert(alert);</span>
+            }
+<span class="nc" id="L130">        }</span>
+<span class="nc" id="L131">    }</span>
+    /**
+     * Triggers an alert for the monitoring system. This method can be extended to
+     * notify medical staff, log the alert, or perform other actions. The method
+     * currently assumes that the alert information is fully formed when passed as
+     * an argument.
+     *
+     * @param alert the alert object containing details about the alert condition
+     */
+    private void triggerAlert(Alert alert) {
+<span class="nc" id="L141">        OutputStrategy outputStrategy = new ConsoleOutputStrategy();</span>
+<span class="nc" id="L142">        outputStrategy.output(Integer.parseInt(alert.getPatientId()), alert.getTimestamp(), alert.getCondition(), &quot;ALERT&quot;);</span>
+<span class="nc" id="L143">        alertManager.logAlert(alert);</span>
+<span class="nc" id="L144">    }</span>
+
+    /**
+     * Checks if the trend alert condition is met for the given list of patient records.
+     *
+     * @param records the list of patient records to check
+     * @return true if the trend alert condition is met, false otherwise
+     */
+    public boolean checkTrendAlert(List&lt;PatientRecord&gt; records) {
+<span class="fc" id="L153">        Collections.sort(records, Comparator.comparingLong(PatientRecord::getTimestamp));</span>
+<span class="fc" id="L154">        double rec1 = records.get(0).getMeasurementValue();</span>
+<span class="fc" id="L155">        double rec2 = records.get(1).getMeasurementValue();</span>
+<span class="fc" id="L156">        double rec3 = records.get(2).getMeasurementValue();</span>
+<span class="pc bpc" id="L157" title="5 of 8 branches missed.">        return (rec1 - rec2 &gt; 10 &amp;&amp; rec2 - rec3 &gt; 10) || (rec1 - rec2 &lt; -10 &amp;&amp; rec2 - rec3 &lt; -10);</span>
+    }
+
+    /**
+     * Checks if the low saturation alert condition is met for the given patient record.
+     *
+     * @param record the patient record to check
+     * @return true if the low saturation alert condition is met, false otherwise
+     */
+    public boolean checkCriticalThresholdAlert(PatientRecord record) {
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">        if (!record.getRecordType().contains(&quot;Pressure&quot;)) {</span>
+<span class="nc" id="L168">            return false;</span>
+        }
+<span class="fc" id="L170">        double pressure = record.getMeasurementValue();</span>
+<span class="pc bpc" id="L171" title="4 of 6 branches missed.">        return (record.getRecordType().contains(&quot;Systolic&quot;) &amp;&amp; (pressure &gt; 180 || pressure &lt; 90)) ||</span>
+<span class="pc bnc" id="L172" title="All 6 branches missed.">                (record.getRecordType().contains(&quot;Diastolic&quot;) &amp;&amp; (pressure &gt; 120 || pressure &lt; 60));</span>
+    }
+
+    /**
+     * Checks if the low saturation alert condition is met for the given patient record.
+     *
+     * @param record the patient record to check
+     * @return true if the low saturation alert condition is met, false otherwise
+     */
+    public boolean checkLowSaturationAlert(PatientRecord record) {
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">        if (!record.getRecordType().contains(&quot;Saturation&quot;)) {</span>
+<span class="nc" id="L183">            return false;</span>
+        }
+<span class="fc" id="L185">        double saturation = record.getMeasurementValue();</span>
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">        return saturation &lt; 92;</span>
+    }
+
+    /**
+     * Checks if the rapid drop alert condition is met for the given list of patient records.
+     *
+     * @param records the list of patient records to check
+     * @return true if the rapid drop alert condition is met, false otherwise
+     */
+    public boolean checkRapidDropAlert(List&lt;PatientRecord&gt; records) {
+<span class="fc" id="L196">        Collections.sort(records, Comparator.comparingLong(PatientRecord::getTimestamp));</span>
+<span class="fc" id="L197">        double saturation1 = records.get(0).getMeasurementValue();</span>
+<span class="fc" id="L198">        double saturation2 = records.get(1).getMeasurementValue();</span>
+<span class="pc bpc" id="L199" title="2 of 4 branches missed.">        return saturation1 - saturation2 &gt; 5 &amp;&amp; records.get(1).getTimestamp() - records.get(0).getTimestamp() &lt;= 600000; // 10 minutes in milliseconds</span>
+    }
+
+    /**
+     * Checks if the hypotensive hypoxemia alert condition is met for the given systolic and saturation records.
+     *
+     * @param systolicRecord the systolic record to check
+     * @param saturationRecord the saturation record to check
+     * @return true if the hypotensive hypoxemia alert condition is met, false otherwise
+     */
+    public boolean checkHypotensiveHypoxemiaAlert(PatientRecord systolicRecord, PatientRecord saturationRecord) {
+<span class="pc bpc" id="L210" title="2 of 4 branches missed.">        if (systolicRecord == null || saturationRecord == null) {</span>
+<span class="nc" id="L211">            return false;</span>
+        }
+<span class="pc bpc" id="L213" title="2 of 4 branches missed.">        if (!systolicRecord.getRecordType().contains(&quot;Pressure&quot;) || !saturationRecord.getRecordType().contains(&quot;Saturation&quot;)) {</span>
+<span class="nc" id="L214">            return false;</span>
+        }
+<span class="fc" id="L216">        double systolic = systolicRecord.getMeasurementValue();</span>
+<span class="fc" id="L217">        double saturation = saturationRecord.getMeasurementValue();</span>
+<span class="pc bpc" id="L218" title="2 of 4 branches missed.">        return systolic &lt; 90 &amp;&amp; saturation &lt; 92;</span>
+    }
+
+    /**
+     * Evaluates the ECG data for the given patient record and checks if the abnormal ECG peak condition is met.
+     *
+     * @param record the patient record to evaluate
+     * @param ecgWindow the queue of recent ECG readings
+     * @param ecgSum the sum of the ECG readings in the window
+     * @param windowSize the size of the sliding window
+     * @param threshold the threshold for abnormal peak
+     * @return true if the abnormal ECG peak condition is met, false otherwise
+     */
+    public boolean evaluateECGData(PatientRecord record, Queue&lt;Double&gt; ecgWindow, double ecgSum, int windowSize, double threshold) {
+<span class="fc" id="L232">        double heartRate = record.getMeasurementValue();</span>
+<span class="fc" id="L233">        ecgSum += heartRate;</span>
+<span class="fc" id="L234">        ecgWindow.add(heartRate);</span>
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">        if (ecgWindow.size() &gt; windowSize) {</span>
+<span class="nc" id="L236">            ecgSum -= ecgWindow.poll();</span>
+        }
+<span class="fc" id="L238">        double average = ecgSum / ecgWindow.size();</span>
+<span class="pc bpc" id="L239" title="1 of 2 branches missed.">        return heartRate &gt; average * threshold;</span>
+    }
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

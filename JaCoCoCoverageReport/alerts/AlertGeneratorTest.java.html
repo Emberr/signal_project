@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AlertGeneratorTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java in cardio_generator Coverage Results</a> &gt; <a href="index.source.html" class="el_package">alerts</a> &gt; <span class="el_source">AlertGeneratorTest.java</span></div><h1>AlertGeneratorTest.java</h1><pre class="source lang-java linenums">package alerts;
+
+import com.alerts.AlertGenerator;
+import com.alerts.AlertManager;
+import com.data_management.DataStorage;
+import com.data_management.PatientRecord;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import com.data_management.Patient;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+<span class="fc" id="L18">public class AlertGeneratorTest {</span>
+
+<span class="fc" id="L20">    public Patient mock = new Patient(1);</span>
+<span class="fc" id="L21">    public DataStorage storage = new DataStorage();</span>
+<span class="fc" id="L22">    public AlertManager alertManager = new AlertManager();</span>
+<span class="fc" id="L23">    public AlertGenerator alertGenerator = new AlertGenerator(storage, alertManager);</span>
+
+    @Test
+    @DisplayName(&quot;Test checkTrendAlert method&quot;)
+    public void testCheckTrendAlert() {
+<span class="fc" id="L28">        mock.addRecord(100, &quot;SystolicPressure&quot;, 1000);</span>
+<span class="fc" id="L29">        mock.addRecord(120, &quot;SystolicPressure&quot;, 2000);</span>
+<span class="fc" id="L30">        mock.addRecord(140, &quot;SystolicPressure&quot;, 3000);</span>
+<span class="fc" id="L31">        List&lt;PatientRecord&gt; records = mock.getRecords(1000, 3000);</span>
+<span class="fc" id="L32">        assertTrue(alertGenerator.checkTrendAlert(records));</span>
+<span class="fc" id="L33">    }</span>
+
+    @Test
+    @DisplayName(&quot;Test checkCriticalThresholdAlert method&quot;)
+    public void testCheckCriticalThresholdAlert() {
+<span class="fc" id="L38">        mock.addRecord(181, &quot;SystolicPressure&quot;, 1000);</span>
+<span class="fc" id="L39">        List&lt;PatientRecord&gt; records = mock.getRecords(1000, 1000);</span>
+<span class="fc" id="L40">        assertTrue(alertGenerator.checkCriticalThresholdAlert(records.get(0)));</span>
+<span class="fc" id="L41">    }</span>
+
+    @Test
+    @DisplayName(&quot;Test HypotensiveHypoxemiaAlert method&quot;)
+    public void testHypotensiveHypoxemiaAlert() {
+<span class="fc" id="L46">        mock.addRecord(89, &quot;SystolicPressure&quot;, 1000);</span>
+<span class="fc" id="L47">        mock.addRecord(91, &quot;Saturation&quot;, 2000);</span>
+<span class="fc" id="L48">        List&lt;PatientRecord&gt; records = mock.getRecords(1000, 2000);</span>
+<span class="fc" id="L49">        assertTrue(alertGenerator.checkHypotensiveHypoxemiaAlert(records.get(0), records.get(1)));</span>
+<span class="fc" id="L50">    }</span>
+
+
+    @Test
+    @DisplayName(&quot;Test checkLowSaturationAlert method&quot;)
+    public void testCheckLowSaturationAlert() {
+<span class="fc" id="L56">        mock.addRecord(89, &quot;Saturation&quot;, 1000);</span>
+<span class="fc" id="L57">        List&lt;PatientRecord&gt; records = mock.getRecords(1000, 1000);</span>
+<span class="fc" id="L58">        assertTrue(alertGenerator.checkLowSaturationAlert(records.get(0)));</span>
+<span class="fc" id="L59">    }</span>
+
+    @Test
+    @DisplayName(&quot;Test RapidDropAlert method&quot;)
+    public void testRapidDropAlert() {
+<span class="fc" id="L64">        mock.addRecord(110, &quot;Saturation&quot;, 1000);</span>
+<span class="fc" id="L65">        mock.addRecord(100, &quot;Saturation&quot;, 2000);</span>
+<span class="fc" id="L66">        List&lt;PatientRecord&gt; records = mock.getRecords(1000, 3000);</span>
+<span class="fc" id="L67">        assertTrue(alertGenerator.checkRapidDropAlert(records));</span>
+<span class="fc" id="L68">    }</span>
+
+    @Test
+    @DisplayName(&quot;Test checkECGDataAlert method&quot;)
+    public void testCheckECGDataAlert() {
+<span class="fc" id="L73">        mock.addRecord(100, &quot;ECG&quot;, 1000);</span>
+<span class="fc" id="L74">        mock.addRecord(120, &quot;ECG&quot;, 2000);</span>
+<span class="fc" id="L75">        mock.addRecord(170, &quot;ECG&quot;, 3000);</span>
+<span class="fc" id="L76">        Queue&lt;Double&gt; ecgWindow = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L77">        ecgWindow.add(100.0);</span>
+<span class="fc" id="L78">        ecgWindow.add(120.0);</span>
+<span class="fc" id="L79">        assertTrue(alertGenerator.evaluateECGData(mock.getRecords(3000, 3000).get(0), ecgWindow, 220, 10, 1.3));</span>
+<span class="fc" id="L80">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
