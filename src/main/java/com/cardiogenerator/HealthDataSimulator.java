@@ -1,10 +1,13 @@
 package com.cardiogenerator;
 
+import java.net.URISyntaxException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.cardiogenerator.generators.AlertGenerator;
+import com.alerts.AlertGenerator;
+import com.data_management.DataStorage;
+import com.alerts.AlertManager;
 
 import com.cardiogenerator.generators.BloodPressureDataGenerator;
 import com.cardiogenerator.generators.BloodSaturationDataGenerator;
@@ -15,6 +18,7 @@ import com.cardiogenerator.outputs.FileOutputStrategy;
 import com.cardiogenerator.outputs.OutputStrategy;
 import com.cardiogenerator.outputs.TcpOutputStrategy;
 import com.cardiogenerator.outputs.WebSocketOutputStrategy;
+import com.data_management.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,11 +36,16 @@ import java.util.ArrayList;
 public class HealthDataSimulator {
 
     private static int patientCount = 50; // Default number of patients
-    private static ScheduledExecutorService scheduler;
-    private static OutputStrategy outputStrategy = new ConsoleOutputStrategy(); // Default output strategy
+    public static ScheduledExecutorService scheduler;
+    private static OutputStrategy outputStrategy = new WebSocketOutputStrategy(8080); // Default output strategy
     private static final Random random = new Random();
 
-    public static void main(String[] args) throws IOException {
+    public static DataStorage storage = new DataStorage();
+
+    static AlertManager dataManager = new AlertManager();
+
+
+    public static void main(String[] args) throws IOException, URISyntaxException {
 
         parseArguments(args);
 
@@ -46,6 +55,11 @@ public class HealthDataSimulator {
         Collections.shuffle(patientIds); // Randomize the order of patient IDs
 
         scheduleTasksForPatients(patientIds);
+
+        DataReader reader = new WebSocketDataReader("ws://localhost:8080",storage);
+
+        reader.readData(storage);
+
     }
 
     /**
@@ -142,7 +156,7 @@ public class HealthDataSimulator {
      * @param patientCount The number of patients to generate IDs for
      * @return The list of patient IDs
      */
-    private static List<Integer> initializePatientIds(int patientCount) {
+    public static List<Integer> initializePatientIds(int patientCount) {
         List<Integer> patientIds = new ArrayList<>();
         for (int i = 1; i <= patientCount; i++) {
             patientIds.add(i);
@@ -155,21 +169,26 @@ public class HealthDataSimulator {
      *
      * @param patientIds The list of patient IDs to schedule tasks for
      */
-    private static void scheduleTasksForPatients(List<Integer> patientIds) {
+    public static void scheduleTasksForPatients(List<Integer> patientIds) {
         // Initialize the data generators
         ECGDataGenerator ecgDataGenerator = new ECGDataGenerator(patientCount);
         BloodSaturationDataGenerator bloodSaturationDataGenerator = new BloodSaturationDataGenerator(patientCount);
         BloodPressureDataGenerator bloodPressureDataGenerator = new BloodPressureDataGenerator(patientCount);
         BloodLevelsDataGenerator bloodLevelsDataGenerator = new BloodLevelsDataGenerator(patientCount);
-        AlertGenerator alertGenerator = new AlertGenerator(patientCount);
+        AlertGenerator alertGenerator = new AlertGenerator(storage, dataManager);
 
         // Schedule the data generators
         for (int patientId : patientIds) {
             scheduleTask(() -> ecgDataGenerator.generate(patientId, outputStrategy), 1, TimeUnit.SECONDS);
             scheduleTask(() -> bloodSaturationDataGenerator.generate(patientId, outputStrategy), 1, TimeUnit.SECONDS);
-            scheduleTask(() -> bloodPressureDataGenerator.generate(patientId, outputStrategy), 1, TimeUnit.MINUTES);
+            scheduleTask(() -> bloodPressureDataGenerator.generate(patientId, outputStrategy), 1, TimeUnit.SECONDS);
             scheduleTask(() -> bloodLevelsDataGenerator.generate(patientId, outputStrategy), 2, TimeUnit.MINUTES);
-            scheduleTask(() -> alertGenerator.generate(patientId, outputStrategy), 20, TimeUnit.SECONDS);
+            scheduleTask(() -> {
+                Patient patient = storage.getPatient(patientId);
+                long currentTime = System.currentTimeMillis();
+                long startTime = currentTime - TimeUnit.MINUTES.toMillis(1);
+                alertGenerator.evaluateData(patient, startTime, currentTime);
+            }, 1, TimeUnit.SECONDS);
         }
     }
 

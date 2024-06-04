@@ -87,6 +87,10 @@ public class AlertGenerator {
             }
 
             if (record.getRecordType().contains("Saturation")) {
+                if (checkLowSaturationAlert(record)) {
+                    Alert alert = new Alert(patient.getPatientIdString(), "Low Oxygen Saturation", System.currentTimeMillis());
+                    triggerAlert(alert);
+                }
                 lastSaturationReadings.add(record);
                 lastSaturationReading.add(record);
                 if (lastSaturationReadings.size() > 2) {
@@ -94,12 +98,6 @@ public class AlertGenerator {
                 }
                 if (lastSaturationReading.size() > 1) {
                     lastSaturationReading.poll();
-                }
-                if (!lastSaturationReadings.isEmpty()) {
-                    if (checkLowSaturationAlert(lastSaturationReadings.peek())) {
-                        Alert alert = new Alert(patient.getPatientIdString(), "Low Oxygen Saturation", System.currentTimeMillis());
-                        triggerAlert(alert);
-                    }
                 }
                 if (lastSaturationReadings.size() == 2) {
                     if (checkRapidDropAlert(new ArrayList<>(lastSaturationReadings))) {
@@ -116,12 +114,12 @@ public class AlertGenerator {
                 }
             }
 
-            if (record.getRecordType().contains("ECG")) {
-                if (evaluateECGData(record, ecgWindow, ecgSum, WINDOW_SIZE, THRESHOLD)) {
-                    Alert alert = new Alert(patient.getPatientIdString(), "Abnormal ECG Peak", System.currentTimeMillis());
-                    triggerAlert(alert);
-                }
-            }
+//            if (record.getRecordType().contains("ECG")) {
+//                if (evaluateECGData(record, ecgWindow, ecgSum, WINDOW_SIZE, THRESHOLD)) {
+//                    Alert alert = new Alert(patient.getPatientIdString(), "Abnormal ECG Peak", System.currentTimeMillis());
+//                    triggerAlert(alert);
+//                }
+//            }
 
             if (checkCriticalThresholdAlert(record)) {
                 Alert alert = new Alert(patient.getPatientIdString(), "Critical Blood Pressure", System.currentTimeMillis());
