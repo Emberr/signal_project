@@ -7,14 +7,15 @@ import com.data_management.PatientRecord;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DataReaderTest {
+public class FileDataReaderTest {
 
     @Test
-    void testReadData() throws IOException {
+    void testReadData() throws IOException, URISyntaxException {
 
         DataReader reader = new FileDataReader("test_data");
         DataStorage storage = new DataStorage();

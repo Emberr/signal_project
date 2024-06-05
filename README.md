@@ -66,10 +66,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## UML Diagrams
 *** 
-#### [UML DIAGRAM DESCRIPTIONS](uml_models/description.md)
-[Alert State Diagram](uml_models/AlertState.png)
+#### [UML DIAGRAM DESCRIPTIONS](WEEK2TASKS/description.md)
+[Alert State Diagram](WEEK2TASKS/AlertState.png)
 
-[Alert Sequence Diagram](uml_models/AlertSequence.png)
+[Alert Sequence Diagram](WEEK2TASKS/AlertSequence.png)
 
 ## Project Members
 ***

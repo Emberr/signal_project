@@ -56,7 +56,7 @@ public class HealthDataSimulator {
 
         scheduleTasksForPatients(patientIds);
 
-        DataReader reader = new WebSocketDataReader("ws://localhost:8080",storage);
+        DataReader reader = new WebSocketDataReader("ws://localhost:8080");
 
         reader.readData(storage);
 

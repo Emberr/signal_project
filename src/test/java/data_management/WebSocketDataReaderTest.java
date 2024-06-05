@@ -1,35 +1,76 @@
 package data_management;
 
-import com.cardiogenerator.HealthDataSimulator;
-import com.data_management.DataStorage;
-import com.data_management.WebSocketDataReader;
+import com.alerts.Alert;
+import com.alerts.AlertGenerator;
+import com.alerts.AlertManager;
+import com.cardiogenerator.outputs.OutputStrategy;
+import com.cardiogenerator.outputs.WebSocketOutputStrategy;
+import com.data_management.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Executors;
 
-import static com.cardiogenerator.HealthDataSimulator.initializePatientIds;
-import static com.cardiogenerator.HealthDataSimulator.scheduleTasksForPatients;
 import static org.junit.jupiter.api.Assertions.*;
 
 
 public class WebSocketDataReaderTest {
 
-    @Test
-    public void testWebSocketDataReader() throws IOException, URISyntaxException, InterruptedException {
-        int patientCount = 10;
-        HealthDataSimulator.scheduler = Executors.newScheduledThreadPool(patientCount * 4);
+    OutputStrategy outputStrategy;
+    AlertGenerator alertGenerator;
+    AlertManager alertManager;
 
-        List<Integer> patientIds = initializePatientIds(patientCount);
-        Collections.shuffle(patientIds);
+    @Test
+    @DisplayName("Test WebSocketDataReader")
+    public void testWebSocketDataReader() throws IOException, URISyntaxException, InterruptedException {
+
         DataStorage storage = new DataStorage();
-        scheduleTasksForPatients(patientIds);
-        WebSocketDataReader reader = new WebSocketDataReader("ws://localhost:8080",storage);
+        outputStrategy = new WebSocketOutputStrategy(8080);
+        WebSocketDataReader reader = new WebSocketDataReader("ws://localhost:8080");
         reader.readData(storage);
-        Thread.sleep(1500);
-        assertTrue(!storage.getAllPatients().isEmpty());
+        Thread.sleep(1000);
+        outputStrategy.output(1, 0, "SystolicPressure", "180");
+        Thread.sleep(1000);
+        assertEquals(1,storage.getRecords(1,0,10).size());
     }
+
+    @Test
+    @DisplayName("Test Data Evaluation from Port")
+    public void testDataEvaluation() throws IOException, URISyntaxException, InterruptedException {
+        DataStorage storage = new DataStorage();
+        outputStrategy = new WebSocketOutputStrategy(8888);
+        WebSocketDataReader reader = new WebSocketDataReader("ws://localhost:8888");
+        reader.readData(storage);
+        Thread.sleep(1000);
+        outputStrategy.output(1, 0, "SystolicPressure", "181");
+        Thread.sleep(1000);
+        alertManager = new AlertManager();
+        alertGenerator = new AlertGenerator(storage,alertManager);
+        Patient mock = storage.getPatient(1);
+        alertGenerator.evaluateData(mock,0,10);
+        List<Alert> patientAlerts = alertManager.getAlertsForPatient("1");
+        assertTrue(patientAlerts.get(0).getCondition().equals("Critical Blood Pressure"));
+    }
+
+    @Test
+    @DisplayName("Test Invalid URL")
+    public void testInvalidSyntax() {
+        outputStrategy = new WebSocketOutputStrategy(88);
+        assertThrows(URISyntaxException.class, () -> {
+            WebSocketDataReader reader = new WebSocketDataReader("ws://invalid url");
+            Thread.sleep(1000);
+            reader.readData(new DataStorage());
+        });
+    }
+
+    @Test
+    @DisplayName("Test Invalid Port")
+    public void testInvalidPort() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            outputStrategy = new WebSocketOutputStrategy(888888);
+        });
+    }
+
 }

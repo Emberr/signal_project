@@ -1,12 +1,14 @@
 package com.data_management;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.alerts.AlertGenerator;
 import com.alerts.AlertManager;
+import com.cardiogenerator.outputs.WebSocketOutputStrategy;
 
 /**
  * Manages storage and retrieval of patient data within a healthcare monitoring
@@ -78,36 +80,45 @@ public class DataStorage {
     }
 
     /**
+     * Retrieves a Patient object for a specific patient.
+     *
+     * @param patientId the unique identifier of the patient to be retrieved
+     * @return the Patient object associated with the given patientId, or null if no such patient exists
+     */
+    public Patient getPatient(int patientId) {
+        return patientMap.get(patientId);
+    }
+
+    /**
      * The main method for the DataStorage class.
      * Initializes the system, reads data into storage, and continuously monitors
      * and evaluates patient data.
      * 
      * @param args command line arguments
      */
-    public static void main(String[] args) throws IOException {
-        DataReader reader = new FileDataReader("test_data");
-        DataStorage storage = new DataStorage();
-
-        reader.readData(storage);
-
-        // Example of using DataStorage to retrieve and print records for a patient
-        List<PatientRecord> records = storage.getRecords(2, 0, 1200);
-        for (PatientRecord record : records) {
-            System.out.println("Record for Patient ID: " + record.getPatientId() +
-                    ", Type: " + record.getRecordType() +
-                    ", Data: " + record.getMeasurementValue() +
-                    ", Timestamp: " + record.getTimestamp());
-        }
-
-        // Initialize the AlertGenerator with the storage
-        AlertManager alertManager = new AlertManager();
-        AlertGenerator alertGenerator = new AlertGenerator(storage, alertManager);
-
-        // Evaluate all patients' data to check for conditions that may trigger alerts
-
-        for (Patient patient : storage.getAllPatients()) {
-            alertGenerator.evaluateData(patient, 0, 1200);
-        }
+    public static void main(String[] args) throws IOException, URISyntaxException {
+//        DataStorage storage = new DataStorage();
+//
+//        DataReader reader = new WebSocketDataReader("ws://localhost:8080",storage);
+//
+//
+//        reader.readData(storage);
+//
+//        // Example of using DataStorage to retrieve and print records for a patient
+//        List<PatientRecord> records = storage.getRecords(2, 0, 1200);
+//        for (PatientRecord record : records) {
+//            System.out.println("Record for Patient ID: " + record.getPatientId() +
+//                    ", Type: " + record.getRecordType() +
+//                    ", Data: " + record.getMeasurementValue() +
+//                    ", Timestamp: " + record.getTimestamp());
+//        }
+//
+//        AlertManager alertManager = new AlertManager();
+//        AlertGenerator alertGenerator = new AlertGenerator(storage, alertManager);
+//
+//        for (Patient patient : storage.getAllPatients()) {
+//            alertGenerator.evaluateData(patient, 0, 1200);
+//        }
 
     }
 }
