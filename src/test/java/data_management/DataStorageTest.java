@@ -17,7 +17,7 @@ class DataStorageTest {
     void testAddAndGetRecords() throws IOException {
         // TODO Perhaps you can implement a mock data reader to mock the test data?
         //DataReader reader = new FileDataReader("data/test_data.csv");
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         //reader.readData(storage);
         storage.addPatientData(1, 100.0, "HeartRate", 1714376789050L);
         storage.addPatientData(1, 120.0, "HeartRate", 1714376789051L);

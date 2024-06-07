@@ -26,7 +26,7 @@ public class WebSocketDataReaderTest {
     @DisplayName("Test WebSocketDataReader")
     public void testWebSocketDataReader() throws IOException, URISyntaxException, InterruptedException {
 
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         outputStrategy = new WebSocketOutputStrategy(8080);
         WebSocketDataReader reader = new WebSocketDataReader("ws://localhost:8080");
         reader.readData(storage);
@@ -39,7 +39,7 @@ public class WebSocketDataReaderTest {
     @Test
     @DisplayName("Test Data Evaluation from Port")
     public void testDataEvaluation() throws IOException, URISyntaxException, InterruptedException {
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         outputStrategy = new WebSocketOutputStrategy(8888);
         WebSocketDataReader reader = new WebSocketDataReader("ws://localhost:8888");
         reader.readData(storage);
@@ -61,7 +61,7 @@ public class WebSocketDataReaderTest {
         assertThrows(URISyntaxException.class, () -> {
             WebSocketDataReader reader = new WebSocketDataReader("ws://invalid url");
             Thread.sleep(1000);
-            reader.readData(new DataStorage());
+            reader.readData(DataStorage.getInstance());
         });
     }
 

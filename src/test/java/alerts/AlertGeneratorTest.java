@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.data_management.Patient;
 
+import javax.xml.crypto.Data;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -18,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class AlertGeneratorTest {
 
     public Patient mock = new Patient(1);
-    public DataStorage storage = new DataStorage();
+    public DataStorage storage = DataStorage.getInstance();
     public AlertManager alertManager = new AlertManager();
     public AlertGenerator alertGenerator = new AlertGenerator(storage, alertManager);
 

@@ -18,7 +18,7 @@ public class FileDataReaderTest {
     void testReadData() throws IOException, URISyntaxException {
 
         DataReader reader = new FileDataReader("test_data");
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
 
         reader.readData(storage);
 

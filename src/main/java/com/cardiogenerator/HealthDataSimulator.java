@@ -40,9 +40,10 @@ public class HealthDataSimulator {
     private static OutputStrategy outputStrategy = new WebSocketOutputStrategy(8080); // Default output strategy
     private static final Random random = new Random();
 
-    public static DataStorage storage = new DataStorage();
-
+    public static DataStorage storage = DataStorage.getInstance();
     static AlertManager dataManager = new AlertManager();
+
+    private static HealthDataSimulator instance;
 
 
     public static void main(String[] args) throws IOException, URISyntaxException {
@@ -60,6 +61,8 @@ public class HealthDataSimulator {
 
         reader.readData(storage);
 
+    }
+    private HealthDataSimulator() {
     }
 
     /**
@@ -201,5 +204,12 @@ public class HealthDataSimulator {
      */
     private static void scheduleTask(Runnable task, long period, TimeUnit timeUnit) {
         scheduler.scheduleAtFixedRate(task, random.nextInt(5), period, timeUnit);
+    }
+
+    public static HealthDataSimulator getInstance() {
+        if (instance == null) {
+            instance = new HealthDataSimulator();
+        }
+        return instance;
     }
 }

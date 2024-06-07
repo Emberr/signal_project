@@ -53,7 +53,7 @@ public class AlertGenerator {
         Queue<Double> ecgWindow = new LinkedList<>();
         double ecgSum = 0;
         final int WINDOW_SIZE = 10;
-        final double THRESHOLD = 1.3;
+        final double THRESHOLD = 1.5;
 
         for (PatientRecord record : records) {
             if (record.getRecordType().contains("Systolic")) {
@@ -114,12 +114,12 @@ public class AlertGenerator {
                 }
             }
 
-//            if (record.getRecordType().contains("ECG")) {
-//                if (evaluateECGData(record, ecgWindow, ecgSum, WINDOW_SIZE, THRESHOLD)) {
-//                    Alert alert = new Alert(patient.getPatientIdString(), "Abnormal ECG Peak", System.currentTimeMillis());
-//                    triggerAlert(alert);
-//                }
-//            }
+            if (record.getRecordType().contains("ECG")) {
+                if (evaluateECGData(record, ecgWindow, ecgSum, WINDOW_SIZE, THRESHOLD)) {
+                    Alert alert = new Alert(patient.getPatientIdString(), "Abnormal ECG Peak", System.currentTimeMillis());
+                    triggerAlert(alert);
+                }
+            }
 
             if (checkCriticalThresholdAlert(record)) {
                 Alert alert = new Alert(patient.getPatientIdString(), "Critical Blood Pressure", System.currentTimeMillis());
