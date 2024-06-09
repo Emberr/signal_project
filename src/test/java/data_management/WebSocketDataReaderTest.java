@@ -31,9 +31,9 @@ public class WebSocketDataReaderTest {
         WebSocketDataReader reader = new WebSocketDataReader("ws://localhost:8080");
         reader.readData(storage);
         Thread.sleep(1000);
-        outputStrategy.output(1, 0, "SystolicPressure", "180");
+        outputStrategy.output(1, 9, "SystolicPressure", "180");
         Thread.sleep(1000);
-        assertEquals(1,storage.getRecords(1,0,10).size());
+        assertEquals(1,storage.getRecords(1,9,10).size());
     }
 
     @Test

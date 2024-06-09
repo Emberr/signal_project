@@ -20,10 +20,8 @@ public class PatientRecord {
      * 
      * @param patientId        the unique identifier for the patient
      * @param measurementValue the numerical value of the recorded measurement
-     * @param recordType       the type of measurement (e.g., "ECG", "Blood
-     *                         Pressure")
-     * @param timestamp        the time at which the measurement was recorded, in
-     *                         milliseconds since epoch
+     * @param recordType       the type of measurement (e.g., "ECG", "Blood Pressure")
+     * @param timestamp        the time at which the measurement was recorded, in milliseconds
      */
     public PatientRecord(int patientId, double measurementValue, String recordType, long timestamp) {
         this.patientId = patientId;

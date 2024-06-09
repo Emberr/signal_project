@@ -37,10 +37,8 @@ public class DataStorage {
      *
      * @param patientId        the unique identifier of the patient
      * @param measurementValue the value of the health metric being recorded
-     * @param recordType       the type of record, e.g., "HeartRate",
-     *                         "BloodPressure"
-     * @param timestamp        the time at which the measurement was taken, in
-     *                         milliseconds since the Unix epoch
+     * @param recordType       the type of record, e.g., "HeartRate", "BloodPressure"
+     * @param timestamp        the time at which the measurement was taken, in milliseconds
      */
     public void addPatientData(int patientId, double measurementValue, String recordType, long timestamp) {
         Patient patient = patientMap.get(patientId);
@@ -55,12 +53,9 @@ public class DataStorage {
      * Retrieves a list of PatientRecord objects for a specific patient, filtered by
      * a time range.
      *
-     * @param patientId the unique identifier of the patient whose records are to be
-     *                  retrieved
-     * @param startTime the start of the time range, in milliseconds since the Unix
-     *                  epoch
-     * @param endTime   the end of the time range, in milliseconds since the Unix
-     *                  epoch
+     * @param patientId the unique identifier of the patient whose records are to be retrieved
+     * @param startTime the start of the time range, in milliseconds
+     * @param endTime   the end of the time range, in milliseconds
      * @return a list of PatientRecord objects that fall within the specified time
      *         range
      */

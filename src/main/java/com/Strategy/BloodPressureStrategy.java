@@ -8,6 +8,12 @@ public class BloodPressureStrategy implements AlertStrategy {
     private static final double DIASTOLIC_THRESHOLD_HIGH = 120;
     private static final double DIASTOLIC_THRESHOLD_LOW = 60;
 
+    /**
+     * Checks if the patient record meets the criteria for triggering an alert.
+     *
+     * @param record the patient record to check
+     * @return true if the alert should be triggered, false otherwise
+     */
     @Override
     public boolean checkAlert(PatientRecord record) {
         if (!record.getRecordType().contains("Pressure")) {

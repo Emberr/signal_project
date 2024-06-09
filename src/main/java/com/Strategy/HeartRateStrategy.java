@@ -14,8 +14,22 @@ public class HeartRateStrategy implements AlertStrategy {
     private List<PatientRecord> records;
     private int start = 0;
 
+    /**
+     * Constructs a new HeartRateStrategy.
+     */
+    public HeartRateStrategy() {
+        records = new LinkedList<>();
+    }
+
+    /**
+     * Checks if the patient record meets the criteria for triggering an alert.
+     *
+     * @param record the patient record to check
+     * @return true if the alert should be triggered, false otherwise
+     */
+    @Override
     public boolean checkAlert(PatientRecord record) {
-        if (!records.get(0).getRecordType().contains("ECG")) {
+        if (!record.getRecordType().contains("ECG")) {
             return false;
         }
         records.add(record);

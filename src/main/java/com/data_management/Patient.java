@@ -45,9 +45,8 @@ public class Patient {
      * specified time range.
      * The method filters records based on the start and end times provided.
      *
-     * @param startTime the start of the time range, in milliseconds since UNIX
-     *                  epoch
-     * @param endTime   the end of the time range, in milliseconds since UNIX epoch
+     * @param startTime the start of the time range, in milliseconds
+     * @param endTime   the end of the time range, in milliseconds
      * @return a list of PatientRecord objects that fall within the specified time
      *         range
      */

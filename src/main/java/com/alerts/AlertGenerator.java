@@ -20,13 +20,10 @@ public class AlertGenerator {
     private AlertManager alertManager;
 
     /**
-     * Constructs an {@code AlertGenerator} with a specified {@code DataStorage}.
-     * The {@code DataStorage} is used to retrieve patient data that this class
-     * will monitor and evaluate.
+     * Constructs a new AlertGenerator with the specified data storage and alert manager.
      *
-     * @param dataStorage the data storage system that provides access to patient
-     *                    data
-     * @param alertManager the alert manager system that logs and manages alerts
+     * @param dataStorage the data storage instance to use for accessing patient data
+     * @param alertManager the alert manager instance to use for logging alerts
      */
     public AlertGenerator(DataStorage dataStorage, AlertManager alertManager) {
         this.dataStorage = dataStorage;
@@ -34,14 +31,13 @@ public class AlertGenerator {
     }
 
     /**
-     * Evaluates the specified patient's data to determine if any alert conditions
-     * are met. If a condition is met, an alert is triggered via the
-     * {@link #triggerAlert}
-     * method. This method should define the specific conditions under which an
-     * alert
-     * will be triggered.
+     * Evaluates patient data for the specified patient within the given time range.
+     * This method checks for various health conditions and triggers alerts when
+     * certain criteria are met.
      *
-     * @param patient the patient data to evaluate for alert conditions
+     * @param patient   the patient for whom data will be evaluated
+     * @param startTime the start of the time range, in milliseconds
+     * @param endTime   the end of the time range, in milliseconds
      */
     public void evaluateData(Patient patient, long startTime, long endTime) {
         List<PatientRecord> records = dataStorage.getRecords(patient.getPatientId(), startTime, endTime);

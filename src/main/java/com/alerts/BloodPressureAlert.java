@@ -6,7 +6,7 @@ public class BloodPressureAlert extends Alert{
      *
      * @param patientId the unique identifier of the patient
      * @param condition the condition that triggered the alert
-     * @param timestamp the time at which the alert was triggered, in milliseconds since UNIX epoch
+     * @param timestamp the time at which the alert was triggered, in milliseconds
      */
     public BloodPressureAlert(String patientId, String condition, long timestamp) {
         super(patientId, condition, timestamp);
